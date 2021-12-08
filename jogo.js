@@ -30,6 +30,25 @@ const flappyBird = {
   },
 };
 
+const getReadyMsg = {
+  sourceX: 134,
+  sourceY: 0,
+  largura: 174,
+  altura: 152,
+  x: (canvas.width / 2) - 174 / 2,
+  y: 50,
+  
+  draw() {
+    contexto.drawImage(
+      source,
+      getReadyMsg.sourceX, getReadyMsg.sourceY,
+      getReadyMsg.largura, getReadyMsg.altura,
+      getReadyMsg.x, getReadyMsg.y,
+      getReadyMsg.largura, getReadyMsg.altura,
+    );
+  }
+}
+
 const floor = {
   sourceX: 0,
   sourceY: 610,
@@ -55,7 +74,7 @@ const floor = {
       floor.largura, floor.altura,
     );
   },
-};
+}
 
 const backGround = {
   sourceX: 390,
@@ -87,14 +106,51 @@ const backGround = {
   }
 }
 
-function loop() {
-  flappyBird.atualiza();
+let activeScreen = {};
+function changeScreen(newScreen) {
+  activeScreen = newScreen;
+}
 
-  backGround.draw();
-  floor.draw();
-  flappyBird.draw();
+let Screens = {
+  START: {
+    draw() {
+      backGround.draw();
+      floor.draw();
+      flappyBird.draw();
+      getReadyMsg.draw();
+    },
+    click() {
+      changeScreen(Screens.GAME);
+    },
+    atualiza() {
+
+    }
+  }
+};
+
+Screens.GAME = {
+  draw() {
+    backGround.draw();
+    floor.draw();
+    flappyBird.draw();
+  },
+  atualiza() {
+    flappyBird.atualiza();
+  }
+}
+
+function loop() {
+  activeScreen.draw();
+  activeScreen.atualiza();
 
   requestAnimationFrame(loop);
 }
 
+window.addEventListener('click', function() {
+  if(activeScreen.click) {
+    activeScreen.click();
+  }
+})
+
+changeScreen(Screens.START);
 loop();
