@@ -1,5 +1,5 @@
 const source = new Image();
-source.src = './sprites.png';
+source.src = './src/sprites.png';
 
 const canvas = document.querySelector('canvas');
 const contexto = canvas.getContext('2d');
