@@ -1,6 +1,9 @@
 const source = new Image();
 source.src = './src/sprites.png';
 
+const hit = new Audio();
+hit.src = './src/sounds/hit.wav'
+
 const canvas = document.querySelector('canvas');
 const contexto = canvas.getContext('2d');
 
@@ -33,7 +36,11 @@ function createFlappyBird() {
   
     atualiza() {
       if (collide(flappyBird, floor)) {
-        
+        hit.play();
+
+        setTimeout(()  => {
+
+        }, 500);
         changeScreen(Screens.START);
         return;
       }
