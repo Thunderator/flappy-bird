@@ -35,11 +35,11 @@ function createFlappyBird() {
     },
   
     atualiza() {
-      if (collide(flappyBird, floor)) {
+      if (collide(globais.flappyBird, globais.floor)) {
         hit.volume = 0.3;
         hit.play();
 
-        setTimeout(()  => {
+        setTimeout(() => {
 
         }, 500);
         changeScreen(Screens.START);
@@ -81,31 +81,44 @@ const getReadyMsg = {
   },
 }
 
-const floor = {
-  sourceX: 0,
-  sourceY: 610,
-  largura: 224,
-  altura: 112,
-  x: 0,
-  y: canvas.height - 112,
+function createFloor() {
+  const floor = {
+    sourceX: 0,
+    sourceY: 610,
+    largura: 224,
+    altura: 112,
+    x: 0,
+    y: canvas.height - 112,
 
-  draw() {
-    contexto.drawImage(
-      source,
-      floor.sourceX, floor.sourceY,
-      floor.largura, floor.altura,
-      floor.x, floor.y,
-      floor.largura, floor.altura,
-    );
+    atualiza() {
+      const repeteEm = floor.largura / 2;
 
-    contexto.drawImage(
-      source,
-      floor.sourceX, floor.sourceY,
-      floor.largura, floor.altura,
-      floor.x + floor.largura, floor.y,
-      floor.largura, floor.altura,
-    );
-  },
+      if (floor.x <= - repeteEm){
+        return floor.x=0
+      }
+
+      floor.x = floor.x - 1;
+    },
+  
+    draw() {
+      contexto.drawImage(
+        source,
+        floor.sourceX, floor.sourceY,
+        floor.largura, floor.altura,
+        floor.x, floor.y,
+        floor.largura, floor.altura,
+      );
+  
+      contexto.drawImage(
+        source,
+        floor.sourceX, floor.sourceY,
+        floor.largura, floor.altura,
+        floor.x + floor.largura, floor.y,
+        floor.largura, floor.altura,
+      );
+    },
+  }
+  return floor;
 }
 
 const backGround = {
@@ -152,10 +165,11 @@ const Screens = {
   START: {
     initialize() {
       globais.flappyBird = createFlappyBird();
+      globais.floor = createFloor();
     },
     draw() {
       backGround.draw();
-      floor.draw();
+      globais.floor.draw();
       globais.flappyBird.draw();
       getReadyMsg.draw();
     },
@@ -163,7 +177,7 @@ const Screens = {
       changeScreen(Screens.GAME);
     },
     atualiza() {
-
+      globais.floor.atualiza();
     }
   }
 };
@@ -171,7 +185,7 @@ const Screens = {
 Screens.GAME = {
   draw() {
     backGround.draw();
-    floor.draw();
+    globais.floor.draw();
     globais.flappyBird.draw();
   },
   click() {
@@ -179,6 +193,7 @@ Screens.GAME = {
   },
   atualiza() {
     globais.flappyBird.atualiza();
+    globais.floor.atualiza();
   }
 }
 
