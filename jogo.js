@@ -36,6 +36,7 @@ function createFlappyBird() {
   
     atualiza() {
       if (collide(flappyBird, floor)) {
+        hit.volume = 0.3;
         hit.play();
 
         setTimeout(()  => {
