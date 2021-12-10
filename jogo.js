@@ -1,3 +1,5 @@
+let frames = 0;
+
 const source = new Image();
 source.src = './src/sprites.png';
 
@@ -48,11 +50,33 @@ function createFlappyBird() {
       flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
       flappyBird.y = flappyBird.y + flappyBird.velocidade;
     },
-  
+
+    movements: [
+      {sourceX: 0, sourceY: 0, },
+      {sourceX: 0, sourceY: 26, },
+      {sourceX: 0, sourceY: 52, },
+      {sourceX: 0, sourceY: 26, },
+    ],
+
+    frameAtual: 0,
+    atualizaFrameAtual() {
+      const intervaloDeFrames = 7;
+      const passouOIntervalo = frames % intervaloDeFrames === 0;
+
+      if(passouOIntervalo) {
+        const baseDoIncremento = 1;
+        const incremento = baseDoIncremento + flappyBird.frameAtual;
+        const baseRepeticao = flappyBird.movements.length;
+        flappyBird.frameAtual = incremento % baseRepeticao;
+      }
+    },
+
     draw() {
+      flappyBird.atualizaFrameAtual();
+      const { sourceX, sourceY } = flappyBird.movements[flappyBird.frameAtual];
       contexto.drawImage(
         source,
-        flappyBird.sourceX, flappyBird.sourceY,
+        sourceX, sourceY,
         flappyBird.largura, flappyBird.altura,
         flappyBird.x, flappyBird.y,
         flappyBird.largura, flappyBird.altura,
@@ -201,6 +225,7 @@ function loop() {
   activeScreen.draw();
   activeScreen.atualiza();
 
+  frames = frames + 1;
   requestAnimationFrame(loop);
 }
 
