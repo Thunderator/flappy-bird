@@ -4,31 +4,55 @@ source.src = './src/sprites.png';
 const canvas = document.querySelector('canvas');
 const contexto = canvas.getContext('2d');
 
-const flappyBird = {
-  sourceX: 0,
-  sourceY: 0,
-  largura: 33,
-  altura: 24,
-  x: 10,
-  y: 50,
-  gravidade: 0.25,
-  velocidade: 0,
+function collide(flappyBird, floor) {
+  const flappyBirdY = flappyBird.y + flappyBird.altura;
+  const floorY = floor.y;
 
-  atualiza() {
-    flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
-    flappyBird.y = flappyBird.y + flappyBird.velocidade;
-  },
+  if (flappyBirdY >= floorY) {
+    return true;
+  }
 
-  draw() {
-    contexto.drawImage(
-      source,
-      flappyBird.sourceX, flappyBird.sourceY,
-      flappyBird.largura, flappyBird.altura,
-      flappyBird.x, flappyBird.y,
-      flappyBird.largura, flappyBird.altura,
-    );
-  },
-};
+  return false;
+}
+
+function createFlappyBird() {
+  const flappyBird = {
+    sourceX: 0,
+    sourceY: 0,
+    largura: 33,
+    altura: 24,
+    x: 10,
+    y: 50,
+    gravidade: 0.25,
+    velocidade: 0,
+    jumpHeight: 4.6,
+  
+    jump() {
+      flappyBird.velocidade = - flappyBird.jumpHeight;
+    },
+  
+    atualiza() {
+      if (collide(flappyBird, floor)) {
+        
+        changeScreen(Screens.START);
+        return;
+      }
+      flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
+      flappyBird.y = flappyBird.y + flappyBird.velocidade;
+    },
+  
+    draw() {
+      contexto.drawImage(
+        source,
+        flappyBird.sourceX, flappyBird.sourceY,
+        flappyBird.largura, flappyBird.altura,
+        flappyBird.x, flappyBird.y,
+        flappyBird.largura, flappyBird.altura,
+      );
+    }
+  }
+  return flappyBird;
+}
 
 const getReadyMsg = {
   sourceX: 134,
@@ -46,7 +70,7 @@ const getReadyMsg = {
       getReadyMsg.x, getReadyMsg.y,
       getReadyMsg.largura, getReadyMsg.altura,
     );
-  }
+  },
 }
 
 const floor = {
@@ -106,17 +130,25 @@ const backGround = {
   }
 }
 
+const globais = {};
 let activeScreen = {};
 function changeScreen(newScreen) {
   activeScreen = newScreen;
+
+  if (activeScreen.initialize) {
+    activeScreen.initialize();
+  }
 }
 
-let Screens = {
+const Screens = {
   START: {
+    initialize() {
+      globais.flappyBird = createFlappyBird();
+    },
     draw() {
       backGround.draw();
       floor.draw();
-      flappyBird.draw();
+      globais.flappyBird.draw();
       getReadyMsg.draw();
     },
     click() {
@@ -132,10 +164,13 @@ Screens.GAME = {
   draw() {
     backGround.draw();
     floor.draw();
-    flappyBird.draw();
+    globais.flappyBird.draw();
+  },
+  click() {
+    globais.flappyBird.jump();
   },
   atualiza() {
-    flappyBird.atualiza();
+    globais.flappyBird.atualiza();
   }
 }
 
