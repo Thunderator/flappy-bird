@@ -216,8 +216,33 @@ function createPipes() {
           pipeFloorX, pipeFloorY,
           pipes.largura, pipes.altura,
         )
-        
+
+        par.pipeRoof = {
+          x: pipeRoofX,
+          y: pipes.altura + pipeRoofY
+        }
+        par.pipeFloor = {
+          x: pipeFloorX,
+          y: pipeFloorY
+        }
       })
+    },
+
+    temColisaoComOFlappyBird(par) {
+      const flappyHead = globais.flappyBird.y;
+      const flappyFeet = globais.flappyBird.y + globais.flappyBird.altura;
+      
+      if(globais.flappyBird.x >= par.x) {
+        if(flappyHead <= par.pipeRoof.y) {
+          return true;
+        }
+
+        if(flappyFeet >= par.pipeFloor.y) {
+          return true;
+        }
+      }
+
+      return false;
     },
 
     pares: [],
@@ -225,7 +250,7 @@ function createPipes() {
     atualiza() {
       const passou100Frames = frames % 100 === 0;
       if(passou100Frames) {
-        console.log("passou 100 frames");
+        // console.log("passou 100 frames");
         pipes.pares.push(
           {
             x: canvas.width,
@@ -236,6 +261,11 @@ function createPipes() {
 
       pipes.pares.forEach(function(par) {
         par.x = par.x - 2;
+
+        if(pipes.temColisaoComOFlappyBird(par)) {
+          // console.log('Você perdeu');
+          changeScreen(Screens.START);
+        }
 
         if (par.x + pipes.largura <= 0) {
           pipes.pares.shift();
@@ -267,17 +297,15 @@ const Screens = {
     },
     draw() {
       backGround.draw();
-      globais.pipes.draw();
       globais.flappyBird.draw();
       globais.floor.draw();
-      // getReadyMsg.draw();
+      getReadyMsg.draw();
     },
     click() {
       changeScreen(Screens.GAME);
     },
     atualiza() {
       globais.floor.atualiza();
-      globais.pipes.atualiza();
     }
   }
 };
@@ -285,6 +313,7 @@ const Screens = {
 Screens.GAME = {
   draw() {
     backGround.draw();
+    globais.pipes.draw();
     globais.floor.draw();
     globais.flappyBird.draw();
   },
@@ -294,6 +323,7 @@ Screens.GAME = {
   atualiza() {
     globais.flappyBird.atualiza();
     globais.floor.atualiza();
+    globais.pipes.atualiza();
   }
 }
 
