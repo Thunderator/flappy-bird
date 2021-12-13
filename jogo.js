@@ -175,6 +175,79 @@ const backGround = {
   }
 }
 
+function createPipes() {
+  const pipes = {
+    largura: 52,
+    altura: 400,
+    floor: {
+      sourceX: 0,
+      sourceY: 169,
+    },
+    roof: {
+      sourceX: 52,
+      sourceY: 169,
+    },
+
+    draw() {
+      pipes.pares.forEach(function(par) {
+        
+        const yRandom = par.y;
+        const espaco = 90;
+        
+        const pipeRoofX = par.x;
+        const pipeRoofY = yRandom;
+        // Roof Pipe
+        contexto.drawImage(
+          source,
+          pipes.roof.sourceX, pipes.roof.sourceY,
+          pipes.largura, pipes.altura,
+          pipeRoofX, pipeRoofY,
+          pipes.largura, pipes.altura
+        )
+
+        const pipeFloorX = par.x;
+        const pipeFloorY = pipes.altura + espaco + yRandom;
+
+        // Floor Pipe
+        contexto.drawImage(
+          source,
+          pipes.floor.sourceX, pipes.floor.sourceY,
+          pipes.largura, pipes.altura,
+          pipeFloorX, pipeFloorY,
+          pipes.largura, pipes.altura,
+        )
+        
+      })
+    },
+
+    pares: [],
+
+    atualiza() {
+      const passou100Frames = frames % 100 === 0;
+      if(passou100Frames) {
+        console.log("passou 100 frames");
+        pipes.pares.push(
+          {
+            x: canvas.width,
+            y: -150 * (Math.random() + 1),
+          }
+        );
+      }
+
+      pipes.pares.forEach(function(par) {
+        par.x = par.x - 2;
+
+        if (par.x + pipes.largura <= 0) {
+          pipes.pares.shift();
+        }
+      });
+
+    }
+  }
+
+  return pipes;
+}
+
 const globais = {};
 let activeScreen = {};
 function changeScreen(newScreen) {
@@ -190,18 +263,21 @@ const Screens = {
     initialize() {
       globais.flappyBird = createFlappyBird();
       globais.floor = createFloor();
+      globais.pipes = createPipes();
     },
     draw() {
       backGround.draw();
-      globais.floor.draw();
+      globais.pipes.draw();
       globais.flappyBird.draw();
-      getReadyMsg.draw();
+      globais.floor.draw();
+      // getReadyMsg.draw();
     },
     click() {
       changeScreen(Screens.GAME);
     },
     atualiza() {
       globais.floor.atualiza();
+      globais.pipes.atualiza();
     }
   }
 };
