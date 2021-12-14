@@ -44,7 +44,7 @@ function createFlappyBird() {
         setTimeout(() => {
 
         }, 500);
-        changeScreen(Screens.START);
+        changeScreen(Screens.GAME_OVER);
         return;
       }
       flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
@@ -101,6 +101,25 @@ const getReadyMsg = {
       getReadyMsg.largura, getReadyMsg.altura,
       getReadyMsg.x, getReadyMsg.y,
       getReadyMsg.largura, getReadyMsg.altura,
+    );
+  },
+}
+
+const gameOverMsg = {
+  sourceX: 134,
+  sourceY: 153,
+  largura: 226,
+  altura: 200,
+  x: (canvas.width / 2) - 226 / 2,
+  y: 50,
+  
+  draw() {
+    contexto.drawImage(
+      source,
+      gameOverMsg.sourceX, gameOverMsg.sourceY,
+      gameOverMsg.largura, gameOverMsg.altura,
+      gameOverMsg.x, gameOverMsg.y,
+      gameOverMsg.largura, gameOverMsg.altura,
     );
   },
 }
@@ -232,7 +251,7 @@ function createPipes() {
       const flappyHead = globais.flappyBird.y;
       const flappyFeet = globais.flappyBird.y + globais.flappyBird.altura;
       
-      if(globais.flappyBird.x >= par.x) {
+      if((globais.flappyBird.x + globais.flappyBird.largura -3) >= par.x) {
         if(flappyHead <= par.pipeRoof.y) {
           return true;
         }
@@ -264,7 +283,9 @@ function createPipes() {
 
         if(pipes.temColisaoComOFlappyBird(par)) {
           // console.log('Você perdeu');
-          changeScreen(Screens.START);
+          hit.volume = 0.3;
+          hit.play();
+          changeScreen(Screens.GAME_OVER);
         }
 
         if (par.x + pipes.largura <= 0) {
@@ -276,6 +297,23 @@ function createPipes() {
   }
 
   return pipes;
+}
+
+function createScoreboard() {
+  const scoreboard = {
+    pontuacao: 0,
+    draw() {
+      contexto.font = '35px "VT323"';
+      contexto.textAlign = 'right';
+      contexto.fillStyle = 'white';
+      contexto.fillText(`${scoreboard.pontuacao}`, canvas.width - 10, 35);
+    },
+    atualiza() {
+      scoreboard.pontuacao = scoreboard.pontuacao + 1;
+    }
+  }
+
+  return scoreboard;
 }
 
 const globais = {};
@@ -311,11 +349,15 @@ const Screens = {
 };
 
 Screens.GAME = {
+  initialize() {
+    globais.scoreboard = createScoreboard();
+  },
   draw() {
     backGround.draw();
     globais.pipes.draw();
     globais.floor.draw();
     globais.flappyBird.draw();
+    globais.scoreboard.draw();
   },
   click() {
     globais.flappyBird.jump();
@@ -324,6 +366,19 @@ Screens.GAME = {
     globais.flappyBird.atualiza();
     globais.floor.atualiza();
     globais.pipes.atualiza();
+    globais.scoreboard.atualiza();
+  }
+}
+
+Screens.GAME_OVER = {
+  draw() {
+    gameOverMsg.draw();
+  },
+  atualiza() {
+
+  },
+  click() {
+    changeScreen(Screens.START);
   }
 }
 
